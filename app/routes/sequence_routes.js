@@ -56,16 +56,21 @@ router.get('/sequences/:id', (req, res, next) => {
 // POST /examples
 router.post('/sequences', (req, res, next) => {
   // set owner of new example to be current user
-
-  Sequence.create(req.body.sequence)
-    // respond to succesful `create` with status 201 and JSON of new "example"
-    .then(sequence => {
-      res.status(201).json({ sequence: sequence.toObject() })
-    })
-    // if an error occurs, pass it off to our error handler
-    // the error handler needs the error message and the `res` object so that it
-    // can send an error message back to the client
-    .catch(next)
+  console.log('req seq', req.body.sequence.sequence)
+  console.log('is match true?', req.body.sequence.sequence.match(/[^GCTA]/))
+  if (req.body.sequence.sequence.match(/[^GCTA]/)) {
+    res.status(422).send({ message: 'Sequence must contain only CATG letters!' })
+  } else {
+    Sequence.create(req.body.sequence)
+      // respond to succesful `create` with status 201 and JSON of new "example"
+      .then(sequence => {
+        res.status(201).json({ sequence: sequence.toObject() })
+      })
+      // if an error occurs, pass it off to our error handler
+      // the error handler needs the error message and the `res` object so that it
+      // can send an error message back to the client
+      .catch(next)
+  }
 })
 
 // UPDATE

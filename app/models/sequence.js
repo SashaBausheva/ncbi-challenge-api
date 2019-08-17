@@ -7,7 +7,8 @@ const sequenceSchema = new mongoose.Schema({
   },
   sequenceName: {
     type: String,
-    required: true
+    required: true,
+    unique: true
   },
   sequence: {
     type: String,
