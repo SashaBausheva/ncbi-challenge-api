@@ -8,6 +8,7 @@ const sequenceSchema = new mongoose.Schema({
   sequenceName: {
     type: String,
     required: true,
+    index: true,
     unique: true
   },
   sequence: {

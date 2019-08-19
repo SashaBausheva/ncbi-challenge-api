@@ -73,6 +73,37 @@ router.post('/sequences', (req, res, next) => {
   }
 })
 
+// CREATE
+// POST /examples
+router.post('/upload', (req, res, next) => {
+  (req.body.sequences).forEach(function (sequence) {
+    console.log('this is a seq ', sequence)
+    if (sequence.sequence.match(/[^GCTA]/)) {
+      return res.status(422).send({ message: 'Sequence must contain only CATG letters!' })
+    } else {
+      Sequence.create(sequence)
+        // respond to succesful `create` with status 201 and JSON of new "example"
+        .then(sequence => {
+          res.status(201).json({ sequence: sequence.toObject() })
+          return next()
+        })
+        // if an error occurs, pass it off to our error handler
+        // the error handler needs the error message and the `res` object so that it
+        // can send an error message back to the client
+        .catch(next)
+    }
+  })
+  // Sequence.create(req.body.sequence)
+  //   // respond to succesful `create` with status 201 and JSON of new "example"
+  //   .then(sequence => {
+  //     res.status(201).json({ sequence: sequence.toObject() })
+  //   })
+  //   // if an error occurs, pass it off to our error handler
+  //   // the error handler needs the error message and the `res` object so that it
+  //   // can send an error message back to the client
+  //   .catch(next)
+})
+
 // UPDATE
 // PATCH /examples/5a7db6c74d55bc51bdf39793
 router.patch('/sequences/:id', removeBlanks, (req, res, next) => {
