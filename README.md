@@ -6,7 +6,7 @@
 - Link to the deployed API: https://vast-hollows-72654.herokuapp.com
 
 ## Application Description
-This is a single-page application allowing users to access a database of DNA sequences and add new sequences along with their names and descriptions. The backend was built using Express.js and MongoDB. The front-end was built using React.js and Axios for http requests.
+This is a single-page application allowing users to access a database of DNA sequences and add new sequences along with their names and descriptions. The back end was built using Express.js and MongoDB. The front end was built using React.js and Axios for http requests.
 
 ## Technologies Used
 - Express.js
@@ -73,7 +73,7 @@ your ORIGIN will be:
 A full list of Heroku commands can be accessed by running `heroku --help`
 
 ## Planning, Process, and Problem-solving Strategy
-I approached this project by first creating my back-end schema to ensure I understand the required structure for my http requests. The sequence model includes: sequence name (string, uniue), sequence description (string), and the sequence itsel. I also needed to ensure every sequence in the database is unique, which I addressed in my POST routes.<br/><br/>
+I approached this project by first creating my back-end schema to ensure I understand the required structure for my http requests. The sequence model includes: sequence name (string, unique), sequence description (string), and the sequence itsel. I also needed to ensure every sequence in the database is unique, which I addressed in my POST routes.<br/><br/>
 After my backend skeleton was set up and tested with cURL scripts, I focused on the view-sequences view. I implemented the ReactTable component on the front end to GET (index) and display sequence data. The component allows users to filter and/or sort the data by name, description, and sequence itself. I then included a Model component to display each sequence entry separately by clicking on the truncated sequence in the table.<br/><br/>
 After the basic aspects of the table were functioning, I swithed to the add-sequence view. The form in it allows users to manually input sequence information and submit it firing a POST request. If the data is added to the database successfully, the application redirects to the view-sequences view where the new sequence is rendered along with the rest.<br/><br/>
 Finally, I added two more features to view-sequences: Users can now upload multiple sequences via a JSON file and download the entire database as a JSON file as well.
