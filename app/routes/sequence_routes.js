@@ -10,6 +10,7 @@ const Sequence = require('../models/sequence')
 const router = express.Router()
 
 router.get('/sequences', (req, res, next) => {
+  // find all sequences
   Sequence.find()
     .then(sequences => {
       return sequences.map(sequence => sequence.toObject())
@@ -26,31 +27,45 @@ router.get('/sequences', (req, res, next) => {
 // })
 
 router.post('/sequences', (req, res, next) => {
-  console.log('req seq', req.body.sequence.sequence)
-  console.log('is match true?', req.body.sequence.sequence.match(/[^GCTA]/))
+  // check if sequence includes letters other than C, A, T, and G
   if (req.body.sequence.sequence.match(/[^GCTA]/)) {
-    res.status(422).send({ message: 'Sequence must contain only CATG letters!' })
+    res.status(422).send({ message: 'Sequence must contain only letters C, A, T, and G!' })
+  // if not, then...
   } else {
-    Sequence.create(req.body.sequence)
-      .then(sequence => {
-        res.status(201).json({ sequence: sequence.toObject() })
-      })
-      .catch(next)
+    // check if this sequence is already in the database
+    Sequence.count({sequence: req.body.sequence.sequence}, function (err, count) {
+      if (count > 0) {
+        // handle error is it already exists
+        next(err)
+      // if not, proceed to sequence creation
+      } else {
+        Sequence.create(req.body.sequence)
+          .then(sequence => {
+            res.status(201).json({ sequence: sequence.toObject() })
+          })
+          .catch(next)
+      }
+    })
   }
 })
 
 router.post('/upload', (req, res, next) => {
   function asyncPostFunction (item, insertedItems, resolve, reject) {
+    // for each sequence
+    // check if sequence includes letters other than C, A, T, and G
     if (item.sequence.match(/[^GCTA]/)) {
       console.log('Error hit CATG', item.sequence)
       res.status(422).send({ message: 'Sequence must contain only letters representing the four nucleotide bases (C, A, T, G)' })
       reject()
     } else {
+      // check if this sequence is already in the database
       Sequence.count({sequence: item.sequence}, function (err, count) {
         if (count > 0) {
           // console.log('Sequence exists')
+          // if yes, handle error
           reject()
           next(err)
+        // if not, proceed to sequence creation
         } else {
           Sequence.create(item)
             .then(() => {
@@ -67,7 +82,9 @@ router.post('/upload', (req, res, next) => {
   }
 
   // console.log('STARTING REQUEST -------------------------------')
+  // keep track of inserted items to be able to return them in response
   let insertedItems = []
+  // create a promise for sequences
   let requests = (req.body.sequences).map((item) => {
     return new Promise((resolve, reject) => {
       asyncPostFunction(item, insertedItems, resolve, reject)
@@ -75,6 +92,7 @@ router.post('/upload', (req, res, next) => {
   })
 
   Promise.all(requests)
+  // only send back data when all promises have been resolved
     .then(() => {
       // console.log('all sequences inserted')
       res.status(201).send({ sequences: insertedItems })
